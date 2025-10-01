@@ -1,3 +1,6 @@
+using SecretsSharing.Extensions;
+using SecretsSharing.Interfaces;
+using SecretsSharing.Services;
 
 namespace SecretsSharing
 {
@@ -8,15 +11,17 @@ namespace SecretsSharing
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddScoped<IJwtService, JwtService>();
+
+            // Use extension methods for Identity and JWT
+            builder.Services.AddAppIdentity(builder.Configuration);
+            builder.Services.AddJwtAuthentication(builder.Configuration);
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -25,8 +30,8 @@ namespace SecretsSharing
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 
